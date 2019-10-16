@@ -4,7 +4,7 @@ import xlwt
 from bs4 import BeautifulSoup
 
 #模拟登录
-formData={'zjh':'1562810212','mm':'urpscode','v_yzm':'nvax'}
+formData={'zjh':'1562810212','mm':'','v_yzm':'nvax'}
 s=requests.Session()
 Post=s.post(url='http://jwurp.hhuc.edu.cn/loginAction.do',data=formData)
 print (Post.status_code)

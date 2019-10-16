@@ -1,15 +1,20 @@
+#!usr/bin/env python
+# -*-coding:utf-8 -*-
+__author__='WYY'
+__date__='2017.03.26'
+
 #实战小项目：爬取教务网成绩并存入excel
 import requests
 import xlwt
 from bs4 import BeautifulSoup
 
 #模拟登录
-formData={'zjh':'1562810212','mm':'urpscode','v_yzm':'nvax'}
+formData={'zjh':'2014141431216','mm':'xxxxxx'}
 s=requests.Session()
-Post=s.post(url='http://jwurp.hhuc.edu.cn/loginAction.do',data=formData)
+Post=s.post(url='http://zhjw.scu.edu.cn/loginAction.do',data=formData)
 print (Post.status_code)
 #获取基本信息
-detailURL='http://jwurp.hhuc.edu.cn/loginAction.do?type=ln&oper=qbinfo&lnxndm=2016-2017%D1%A7%C4%EA%C7%EF(%C1%BD%D1%A7%C6%DA)'
+detailURL='http://zhjw.scu.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo&lnxndm=2016-2017%D1%A7%C4%EA%C7%EF(%C1%BD%D1%A7%C6%DA)'
 html=s.get(url=detailURL)
 main=html.content.decode('gbk')
 soup=BeautifulSoup(main,'lxml')

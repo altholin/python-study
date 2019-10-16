@@ -19,7 +19,7 @@ import xlrd
 from xlutils.copy import copy
 
 SNO = '1562810212'  # 学号
-pwd = 'urpscode'  # 密码
+pwd = ''  # 密码
 SName = ''  # 学生姓名不用写
 
 capurl = "http://jwurp.hhuc.edu.cn/validateCodeAction.do"  # 验证码地址

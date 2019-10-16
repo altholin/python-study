@@ -14,7 +14,7 @@ opener = urllib.request.build_opener(handler)
 #postdata
 values = {
     'zjh':'1562810212',
-    'mm':'urpscode',
+    'mm':'',
     'v_yzm':''
 }
 postdata = urllib.parse.urlencode(values)
