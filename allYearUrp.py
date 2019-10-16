@@ -20,7 +20,7 @@ from xlutils.copy import copy
 import requests;
 
 SNO = '1562810212'  # 学号
-pwd = 'urpscode'  # 密码
+pwd = ''  # 密码
 SName = ''  # 学生姓名不用写
 
 capurl = "http://jwurp.hhuc.edu.cn/validateCodeAction.do"  # 验证码地址
@@ -94,48 +94,72 @@ def getGrades():
     # main = html.content.decode('gbk')
     # soup = BeautifulSoup(main,'lxml')
     soup = BeautifulSoup(responseGrade, 'lxml')
-    if (soup.a.string != None):
-        title = soup.a.string
-        if (title.__contains__('错误信息')):
-            getGradesTimes = getGradesTimes + 1
-            if (getGradesTimes <= logInMaxTryTimes):
-                getGrades()
-                return None
-            else:
-                print('请检查账号和密码是否正确')
-                return None
-    # print(soup.title.string)
-    try:
-        old_excel = xlrd.open_workbook('data/' + SNO + '_' + SName + '.xls', formatting_info=True)
-    except Exception:
-        getPersonalInfo()
-        getGrades()
-        return None
-    new_excel = copy(old_excel)
-    ws = new_excel.add_sheet('本学期成绩')
-    rowIndex = 0
-    colIndex = 0
-
-    for th in soup.find_all(name='th'):
-        ws.write(rowIndex, colIndex, th.string.strip())
-        colIndex = colIndex + 1
-        print('%-60s' % th.string.strip(), end=' ')
-    print()
-    rowIndex = 1
-    for tr in soup.find_all(class_='odd'):
-        scoreList.append([])
-        colIndex = 0
-        for td in tr.find_all(name='td'):
-            scoreList[rowIndex - 1].append(td.string.strip())
-            ws.write(rowIndex, colIndex, td.string.strip())
-            colIndex = colIndex + 1
-            print('%-60s' % td.string.strip(), end=' ')
-        rowIndex = rowIndex + 1
-        print()
-    gpa = getGPA(scoreList)
-    ws.write(rowIndex + 2, colIndex, '本学期平均绩点为' + str(gpa))
-    print(scoreList)
-    new_excel.save('data/' + SNO + '_' + SName + '.xls')
+    content = soup.find_all('td', align="center")
+    # 将信息放入一个list中,创建new_list(方便后续存入excel)
+    data_list = []
+    for data in content:
+        data_list.append(data.text.strip())
+    new_list = [data_list[i:i + 7] for i in range(0, len(data_list), 7)]
+    # 数据存入excel表格
+    book = xlwt.Workbook()
+    sheet1 = book.add_sheet('sheet1', cell_overwrite_ok=True)
+    heads = [u'课程号', u'课序号', u'课程名', u'英文课程名', u'学分', u'课程属性', u'成绩']
+    print(u'\n准备将数据存入表格...')
+    ii = 0
+    for head in heads:
+        sheet1.write(0, ii, head)
+        ii += 1
+    i = 1
+    for list in new_list:
+        j = 0
+        for data in list:
+            sheet1.write(i, j, data)
+            j += 1
+        i += 1
+    book.save('JiaoWuChengJi.xls')
+    print(u'\n录入成功！')
+    # if (soup.a.string != None):
+    #     title = soup.a.string
+    #     if (title.__contains__('错误信息')):
+    #         getGradesTimes = getGradesTimes + 1
+    #         if (getGradesTimes <= logInMaxTryTimes):
+    #             getGrades()
+    #             return None
+    #         else:
+    #             print('请检查账号和密码是否正确')
+    #             return None
+    # # print(soup.title.string)
+    # try:
+    #     old_excel = xlrd.open_workbook('data/' + SNO + '_' + SName + '.xls', formatting_info=True)
+    # except Exception:
+    #     getPersonalInfo()
+    #     getGrades()
+    #     return None
+    # new_excel = copy(old_excel)
+    # ws = new_excel.add_sheet('本学期成绩')
+    # rowIndex = 0
+    # colIndex = 0
+    #
+    # for th in soup.find_all(name='th'):
+    #     ws.write(rowIndex, colIndex, th.string.strip())
+    #     colIndex = colIndex + 1
+    #     print('%-60s' % th.string.strip(), end=' ')
+    # print()
+    # rowIndex = 1
+    # for tr in soup.find_all(class_='odd'):
+    #     scoreList.append([])
+    #     colIndex = 0
+    #     for td in tr.find_all(name='td'):
+    #         scoreList[rowIndex - 1].append(td.string.strip())
+    #         ws.write(rowIndex, colIndex, td.string.strip())
+    #         colIndex = colIndex + 1
+    #         print('%-60s' % td.string.strip(), end=' ')
+    #     rowIndex = rowIndex + 1
+    #     print()
+    # gpa = getGPA(scoreList)
+    # ws.write(rowIndex + 2, colIndex, '本学期平均绩点为' + str(gpa))
+    # print(scoreList)
+    # new_excel.save('data/' + SNO + '_' + SName + '.xls')
 
 
 def getPersonalInfo():
