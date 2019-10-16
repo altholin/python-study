@@ -17,6 +17,7 @@ from bs4 import BeautifulSoup
 import xlwt
 import xlrd
 from xlutils.copy import copy
+import requests;
 
 SNO = '1562810212'  # 学号
 pwd = 'urpscode'  # 密码
@@ -40,7 +41,9 @@ picPath = 'D:/image.jpg'  # 验证码存放的位置
 # 登陆教务系统
 def AutomaticLogin():  # 利用百度ocr识别验证码,为了弥补识别可能出错的缺陷,识别错误多次识别,若多次识别仍是错误,则认为是学号和密码不符
 
+    # get identifying code image
     picture = opener.open(capurl).read()
+    # restore the image
     local = open(picPath, 'wb')
     local.write(picture)  # 将验证码写入本地
     local.close()
@@ -75,14 +78,24 @@ def getGrades():
     global getGradesTimes
     scoreList = []  # 存放成绩的
     AutomaticLogin()
-    # 获取成绩
+    # 获取本学期成绩
     gradeUrl = 'http://jwurp.hhuc.edu.cn/bxqcjcxAction.do'
-    gradeRequest = urllib.request.Request(gradeUrl)
+    # 获取及格成绩
+    #passUrl = 'http://jwurp.hhuc.edu.cn/xjInfoAction.do?oper=xjxx'
+    passUrl = 'http://jwurp.hhuc.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo&lnxndm=2018-2019%D1%A7%C4%EA%B5%DA%B6%FE%D1%A7%C6%DA(%B6%FE%D1%A7%C6%DA)'
+    passURL = 'http://jwurp.hhuc.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo&lnxndm=2018-2019%D1%A7%C4%EA%B5%DA%B6%FE%D1%A7%C6%DA(%B6%FE%D1%A7%C6%DA)'
+    detailURL = 'http: //jwurp.hhuc.edu.cn/gradeLnAllAction.do?type=ln&oper=qbinfo&lnxndm=2016-2017%D1%A7%C4%EA%C7%EF(%C1%BD%D1%A7%C6%DA)'
+    #gradeRequest = urllib.request.Request(gradeUrl)
+    gradeRequest = urllib.request.Request(passUrl)
     responseGrade = opener.open(gradeRequest).read().decode('gb2312')
     # print(responseGrade)
+    # s = requests.Session()
+    # html = s.get(url=passUrl)
+    # main = html.content.decode('gbk')
+    # soup = BeautifulSoup(main,'lxml')
     soup = BeautifulSoup(responseGrade, 'lxml')
-    if (soup.title.string != None):
-        title = soup.title.string
+    if (soup.a.string != None):
+        title = soup.a.string
         if (title.__contains__('错误信息')):
             getGradesTimes = getGradesTimes + 1
             if (getGradesTimes <= logInMaxTryTimes):
